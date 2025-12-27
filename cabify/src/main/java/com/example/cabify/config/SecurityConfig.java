@@ -16,7 +16,7 @@ public class SecurityConfig {
 
                 // 2. Configure which URLs are public and which are private
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("**/register", "/h2-console/**").permitAll()
+                        .requestMatchers("/api/users/**", "/h2-console/**").permitAll()
                         .anyRequest().authenticated()
                 )
 

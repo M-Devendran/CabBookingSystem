@@ -5,7 +5,8 @@ import com.example.cabify.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
-
+import com.example.cabify.dto.user.UserProfileDto;
+import java.util.NoSuchElementException;
 @Service
 public class UserService {
 
@@ -49,5 +50,16 @@ public class UserService {
         user.setName(name);
         user.setEmail(email);
         return userRepository.save(user);
+    }
+
+    public UserProfileDto getUserById(int id){
+        User user=userRepository.findById(id)
+                .orElseThrow(()->new NoSuchElementException("User  not found with ID: "+id));
+
+        return new UserProfileDto(
+                user.getName(),
+                user.getEmail(),
+                user.getPhone()
+                );
     }
 }
