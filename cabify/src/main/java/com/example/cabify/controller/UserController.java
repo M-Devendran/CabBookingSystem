@@ -1,7 +1,9 @@
 package com.example.cabify.controller;
 
 import com.example.cabify.dto.SuccessResponse;
+import com.example.cabify.model.Login;
 import com.example.cabify.model.User;
+import com.example.cabify.service.LoginService;
 import com.example.cabify.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -29,5 +31,25 @@ public class UserController {
 
         return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
+    @Autowired
+    LoginService loginService;
+
+    @PostMapping("login")
+    public ResponseEntity<SuccessResponse> loginUser(@RequestBody Login login){
+            boolean authenticate= loginService.loginUser(login);
+        if (authenticate) {
+            SuccessResponse response = new SuccessResponse("Login successful!",
+                    HttpStatus.OK.value()
+            );
+            return new ResponseEntity<>(response, HttpStatus.OK);
+        } else {
+            // If login fails, we return UNAUTHORIZED (401)
+            SuccessResponse response = new SuccessResponse("Invalid User ID or Password",
+                    HttpStatus.UNAUTHORIZED.value()
+            );
+            return new ResponseEntity<>(response, HttpStatus.UNAUTHORIZED);
+        }
+    }
+
 
 }

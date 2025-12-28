@@ -3,9 +3,11 @@ package com.example.cabify.config;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.web.SecurityFilterChain;
 
 @Configuration
+@EnableWebSecurity
 public class SecurityConfig {
 
     @Bean
@@ -16,7 +18,7 @@ public class SecurityConfig {
 
                 // 2. Configure which URLs are public and which are private
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("**/register", "/h2-console/**").permitAll()
+                        .requestMatchers("**/register", "/api/users/login", "/h2-console/**").permitAll()
                         .anyRequest().authenticated()
                 )
 
@@ -24,5 +26,7 @@ public class SecurityConfig {
                 .headers(headers -> headers.frameOptions(frame -> frame.disable()));
 
         return http.build();
+
+
     }
 }
