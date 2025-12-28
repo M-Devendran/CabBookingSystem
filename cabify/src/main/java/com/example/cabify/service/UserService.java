@@ -1,12 +1,14 @@
 package com.example.cabify.service;
 
+import com.example.cabify.dto.user.UserProfileDto;
 import com.example.cabify.model.User;
 import com.example.cabify.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
-import com.example.cabify.dto.user.UserProfileDto;
+
 import java.util.NoSuchElementException;
+
 @Service
 public class UserService {
 
@@ -17,7 +19,7 @@ public class UserService {
     private BCryptPasswordEncoder passwordEncoder;
 
 
-    public User registerUser(User user) {
+    public UserProfileDto registerUser(User user) {
 
         if (user.getName() == null || user.getEmail() == null || user.getPassword() == null) {
             throw new IllegalArgumentException("Name, Email, and Password cannot be empty");
@@ -49,17 +51,26 @@ public class UserService {
         user.setPassword(hashedPassword);
         user.setName(name);
         user.setEmail(email);
-        return userRepository.save(user);
-    }
-
-    public UserProfileDto getUserById(int id){
-        User user=userRepository.findById(id)
-                .orElseThrow(()->new NoSuchElementException("User  not found with ID: "+id));
+        User savedUser = userRepository.save(user);
 
         return new UserProfileDto(
+                savedUser.getUserId(),
+                savedUser.getName(),
+                savedUser.getEmail(),
+                savedUser.getPhone()
+        );
+
+    }
+
+    public UserProfileDto getUserById(int id) {
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new NoSuchElementException("User not found with ID: " + id));
+
+        return new UserProfileDto(
+                user.getUserId(),
                 user.getName(),
                 user.getEmail(),
                 user.getPhone()
-                );
+        );
     }
 }
