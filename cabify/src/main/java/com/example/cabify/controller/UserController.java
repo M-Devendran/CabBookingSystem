@@ -1,6 +1,7 @@
 package com.example.cabify.controller;
 
 import com.example.cabify.dto.SuccessResponse;
+import com.example.cabify.dto.user.LoginRequestDto;
 import com.example.cabify.dto.user.UserProfileDto;
 import com.example.cabify.model.User;
 import com.example.cabify.service.UserService;
@@ -33,6 +34,17 @@ public class UserController {
     public ResponseEntity<UserProfileDto> getUserById(@PathVariable int id) {
         UserProfileDto profile = userService.getUserById(id);
         return new ResponseEntity<>(profile, HttpStatus.OK);
+    }
+
+    @PostMapping("login")
+    public ResponseEntity<SuccessResponse<UserProfileDto>> userLogin(@RequestBody LoginRequestDto loginRequestDto){
+        UserProfileDto userProfile = userService.userLogin(loginRequestDto);
+        SuccessResponse<UserProfileDto>  response = new SuccessResponse<>(
+                "Login successful!",
+                HttpStatus.OK.value(),
+                userProfile
+        );
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
 }

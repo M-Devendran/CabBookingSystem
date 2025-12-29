@@ -1,5 +1,6 @@
 package com.example.cabify.service;
 
+import com.example.cabify.dto.user.LoginRequestDto;
 import com.example.cabify.dto.user.UserProfileDto;
 import com.example.cabify.model.User;
 import com.example.cabify.repository.UserRepository;
@@ -73,4 +74,23 @@ public class UserService {
                 user.getPhone()
         );
     }
+
+    public UserProfileDto userLogin(LoginRequestDto loginRequestDto) {
+       User user = userRepository.findByEmail(loginRequestDto.getEmail());
+       if(user == null){
+           throw new NoSuchElementException("User not found");
+       }
+
+       if(!passwordEncoder.matches(loginRequestDto.getPassword(), user.getPassword())){
+           throw new IllegalArgumentException("Invalid email or password");
+       }
+
+       return new UserProfileDto(
+               user.getUserId(),
+               user.getName(),
+               user.getEmail(),
+               user.getPhone()
+       );
+    }
+
 }
