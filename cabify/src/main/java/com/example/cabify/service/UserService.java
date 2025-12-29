@@ -8,7 +8,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.stream.Collectors;
 
 @Service
 public class UserService {
@@ -93,4 +95,18 @@ public class UserService {
        );
     }
 
+    public List<UserProfileDto> getAllUsers() {
+        List<User> users=userRepository.findAll();
+        if (users.isEmpty()) {
+            throw new NoSuchElementException("No users found in the database");
+        }
+        return users.stream()
+                .map(user -> new UserProfileDto(
+                        user.getUserId(),
+                        user.getName(),
+                        user.getEmail(),
+                        user.getPhone()
+                ))
+                .collect(Collectors.toList());
+    }
 }

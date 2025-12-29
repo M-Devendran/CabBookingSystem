@@ -6,9 +6,12 @@ import com.example.cabify.dto.user.UserProfileDto;
 import com.example.cabify.model.User;
 import com.example.cabify.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.graphql.GraphQlProperties;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 
 @RestController
@@ -46,5 +49,12 @@ public class UserController {
         );
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
+
+    @GetMapping("profile")
+    public ResponseEntity<List<UserProfileDto>> getAllUsers(){
+        List<UserProfileDto> users = userService.getAllUsers();
+        return new ResponseEntity<>(users,HttpStatus.OK);
+    }
+
 
 }
