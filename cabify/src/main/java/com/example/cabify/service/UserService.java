@@ -5,7 +5,7 @@ import com.example.cabify.dto.user.UserProfileDto;
 import com.example.cabify.model.User;
 import com.example.cabify.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder; // Change Importimport org.springframework.stereotype.Service;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -19,7 +19,7 @@ public class UserService {
     UserRepository userRepository;
 
     @Autowired
-    private BCryptPasswordEncoder passwordEncoder;
+    private PasswordEncoder passwordEncoder;
 
 
     public UserProfileDto registerUser(User user) {
@@ -78,10 +78,8 @@ public class UserService {
     }
 
     public UserProfileDto userLogin(LoginRequestDto loginRequestDto) {
-       User user = userRepository.findByEmail(loginRequestDto.getEmail());
-       if(user == null){
-           throw new NoSuchElementException("User not found");
-       }
+        User user = userRepository.findByEmail(loginRequestDto.getEmail())
+                .orElseThrow(() -> new NoSuchElementException("User not found"));
 
        if(!passwordEncoder.matches(loginRequestDto.getPassword(), user.getPassword())){
            throw new IllegalArgumentException("Invalid email or password");

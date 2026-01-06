@@ -13,10 +13,4 @@ public class CabifyApplication {
 
         SpringApplication.run(CabifyApplication.class, args);
     }
-
-    @Bean
-    public BCryptPasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
-    }
-
 }
