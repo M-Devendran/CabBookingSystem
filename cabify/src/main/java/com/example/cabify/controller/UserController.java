@@ -1,25 +1,34 @@
 package com.example.cabify.controller;
 
 import com.example.cabify.dto.SuccessResponse;
+import com.example.cabify.dto.user.AuthResponseDto;
 import com.example.cabify.dto.user.LoginRequestDto;
 import com.example.cabify.dto.user.UserProfileDto;
 import com.example.cabify.model.User;
 import com.example.cabify.service.UserService;
+import com.example.cabify.util.JwtUtil;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.graphql.GraphQlProperties;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-
 
 @RestController
 @RequestMapping("/api/users/")
 public class UserController {
 
     @Autowired
-    UserService userService;
+    private UserService userService;
+
+    @Autowired
+    private AuthenticationManager authenticationManager;
+
+    @Autowired
+    private JwtUtil jwtUtil;
 
     @PostMapping("register")
     public ResponseEntity<SuccessResponse<UserProfileDto>> registerUser(@RequestBody User user) {
@@ -29,8 +38,24 @@ public class UserController {
                 HttpStatus.CREATED.value(),
                 userProfile
         );
-
         return new ResponseEntity<>(response, HttpStatus.CREATED);
+    }
+
+    @PostMapping("login")
+    public ResponseEntity<?> userLogin(@RequestBody LoginRequestDto loginRequestDto) throws Exception {
+        try {
+            authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(
+                            loginRequestDto.getEmail(),
+                            loginRequestDto.getPassword()
+                    )
+            );
+        } catch (BadCredentialsException e) {
+            throw new Exception("Incorrect email or password", e);
+        }
+
+        final String jwt = jwtUtil.generateToken(loginRequestDto.getEmail());
+        return ResponseEntity.ok(new AuthResponseDto(jwt));
     }
 
     @GetMapping("profile/{id}")
@@ -39,22 +64,9 @@ public class UserController {
         return new ResponseEntity<>(profile, HttpStatus.OK);
     }
 
-    @PostMapping("login")
-    public ResponseEntity<SuccessResponse<UserProfileDto>> userLogin(@RequestBody LoginRequestDto loginRequestDto){
-        UserProfileDto userProfile = userService.userLogin(loginRequestDto);
-        SuccessResponse<UserProfileDto>  response = new SuccessResponse<>(
-                "Login successful!",
-                HttpStatus.OK.value(),
-                userProfile
-        );
-        return new ResponseEntity<>(response, HttpStatus.OK);
-    }
-
     @GetMapping("profile")
     public ResponseEntity<List<UserProfileDto>> getAllUsers(){
         List<UserProfileDto> users = userService.getAllUsers();
-        return new ResponseEntity<>(users,HttpStatus.OK);
+        return new ResponseEntity<>(users, HttpStatus.OK);
     }
-
-
 }
